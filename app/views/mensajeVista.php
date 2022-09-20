@@ -2,7 +2,7 @@
 
 <!-- Aqui debe ir el contenido de la pagina -->
 <div class="container">
-   <h2 class="text-center"><?php echo $data['subtitulo']; ?></h2>
+   <h2 class="text-center mt-3"><?php echo $data['subtitulo']; ?></h2>
 
    <div class="alert <?php echo $data['color']; ?> mt-3"> <?php echo $data['texto']; ?></div>
 

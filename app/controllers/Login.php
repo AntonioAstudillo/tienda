@@ -15,12 +15,110 @@ class Login extends Controlador{
       $this->vista('loginVista' , $datos);
    }
 
-   public function olvido(){
-      $datos = ['title' => 'Recuperar Password'];
-      $this->vista('olvidoVista' , $datos);
+   public function olvido()
+   {
+      $errores = array();
+
+      if($_SERVER['REQUEST_METHOD'] == "POST")
+      {
+         $data['correoR'] = isset($_POST['correoR']) ? helpers::limpiarDato($_POST['correoR']): "";
+
+         if($data['correoR'] === '')
+         {
+            $errores[] = 'Correo incorrecto';
+         }
+         else
+         {
+            if(!filter_var($data['correoR'] , FILTER_VALIDATE_EMAIL))
+            {
+               $errores['correoR'] = 'El correo es incorrecto';
+            }
+         }
+
+         if(count($errores) > 0) {
+            //mostramos vista de errores
+
+
+            $datos = ['title' => 'Error de correo' ,
+                      'subtitulo' => 'No pudimos procesar su solicitud',
+                      'texto' => 'El correo es incorrecto',
+                      'color' => 'alert-danger',
+                      'url' => 'login/olvido',
+                      'colorBoton' => 'btn-danger',
+                      'textoBoton' => 'Regresar'
+                     ];
+
+            $this->vista('mensajeVista' , $datos);
+
+         }
+         else
+         {
+
+            if($this->validarCorreo($data['correoR']))
+            {
+
+               //ejecutamos metodo del modelo enviar correo
+               if($this->modelo->enviarCorreo($data['correoR']))
+               {
+                  //definimos variables para mostrar en vista
+                  $datos = ['title' => 'Recuperación' ,
+                            'subtitulo' => 'Correo enviado ',
+                            'texto' => "Se te envio un correo de recuperación a la siguiente dirección <b>". $data['correoR']. '</b>',
+                            'color' => 'alert-success',
+                            'url' => 'login',
+                            'colorBoton' => 'btn-success',
+                            'textoBoton' => 'Regresar'
+                           ];
+
+
+               }
+               else
+               {
+
+                  $datos = ['title' => 'Error de correo' ,
+                           'subtitulo' => 'No pudimos procesar su solicitud',
+                           'texto' => 'Existió un problema al enviar el correo electrónico. Prueba por favor más tarde o comuníquese a nuestro servicio de soporte técnico.',
+                           'color' => 'alert-danger',
+                           'url' => 'login/olvido',
+                           'colorBoton' => 'btn-danger',
+                           'textoBoton' => 'Regresar'
+                           ];
+               }
+            }
+            else
+            {
+               $datos = ['title' => 'Error de correo' ,
+                         'subtitulo' => 'No pudimos procesar su solicitud',
+                         'texto' => 'El correo no existe',
+                         'color' => 'alert-danger',
+                         'url' => 'login/olvido',
+                         'colorBoton' => 'btn-danger',
+                         'textoBoton' => 'Regresar'
+                        ];
+
+
+            }
+
+            $this->vista('mensajeVista' , $datos);
+
+
+         }
+      }
+      else
+      {
+         $datos = ['title' => 'Recuperar contraseña' ,
+                  'subtitulo' => '¿Olvidaste tu contraseña?',
+                  'url' => 'menu'
+            ];
+
+         $this->vista('olvidoVista' , $datos);
+      }
+
+
    }
 
-   public function registrar(){
+   public function registrar()
+   {
       $errores = array();
       $data = $_POST;
 
@@ -141,6 +239,85 @@ class Login extends Controlador{
 
    }//cierra funcion registrar
 
+   /*Data es un valor que llega de la URL, el cual simula el id del usuario al cual le vamos a modificar la clave*/
+   public function cambiaClave($data){
+      $errores = array();
+
+      if($_SERVER['REQUEST_METHOD'] == 'POST')
+      {
+         $id = isset($_POST['idUser']) ? $_POST['idUser'] : '';
+         $clave1 = isset($_POST['clave1']) ? $_POST['clave1'] : '';
+         $clave2 = isset($_POST['clave2']) ? $_POST['clave2'] : '';
+
+         if($clave1 == ''){
+            array_push($errores , 'Debe ingresar una clave');
+         }
+         else if($clave2 == ''){
+
+            array_push($errores , 'Debe ingresar la clave de verificación');
+
+         }else if($clave1 != $clave2){
+
+            array_push($errores , 'Las claves ingresadas no coinciden');
+         }
+
+         if(count($errores) > 0){
+            $datos = ['title' => 'Cambiar clave' ,
+                     'subtitulo' => 'Cambia la clave de acceso',
+                     'data' => $data,
+                     'errores' => $errores
+               ];
+
+            $this->vista('cambiarClaveVista' , $datos);
+
+         }
+         else
+         {
+            $clave = Helpers::encriptar($clave1);
+
+
+
+            if($this->modelo->cambiarClaveAcceso($id , $clave) > 0)
+            {
+               $datos = ['title' => 'Clave cambiada' ,
+                         'subtitulo' => 'Clave modificada',
+                         'texto' => 'La clave se modifico con exito',
+                         'color' => 'alert-success',
+                         'url' => 'login',
+                         'colorBoton' => 'btn-success',
+                         'textoBoton' => 'Regresar'
+                        ];
+            }else{
+               $datos = ['title' => 'Clave cambiada' ,
+                         'subtitulo' => 'Error al cambiar clave ',
+                         'texto' => 'La clave no se pudo modificar, intentelo de nuevo. ',
+                         'color' => 'alert-danger',
+                         'url' => 'login/cambiaClave/1',
+                         'colorBoton' => 'btn-danger',
+                         'textoBoton' => 'Intentar otra vez'
+                        ];
+            }
+
+            $this->vista('mensajeVista' , $datos);
+
+         }
+
+      }
+      else{
+         $datos = ['title' => 'Cambia la clave' ,
+                  'subtitulo' => 'Cambia la clave de acceso',
+                  'data' => $data
+            ];
+
+         $this->vista('cambiarClaveVista' , $datos);
+
+      }
+
+
+
+
+
+   }
    /**
     * [validarCorreo Esta función recibe un String y retorna un valor booleano. Su funcionalidad es la de validar si un correo ya existe en la DB]
     * @param  [String] $correo [Correo electronico ingresado por el usuario ]
