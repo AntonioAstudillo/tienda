@@ -81,6 +81,21 @@ class LoginModelo
       return $statement->rowCount();
    }
 
+
+   /**
+    * /[Esta funcion tiene como finalidad, verificar que los datos ingresados desde el login, se encuentren en la database para poder darle acceso al usuario]
+    * @param  [String] $user                   [UserName del usuario ]
+    * @return [Boolean]           [True en caso de que las credenciales sean correctas, false en caso de error ]
+    */
+   public function verificar($user)
+   {
+      $query = "SELECT clave FROM usuarios WHERE email = ?";
+      $statement = $this->conexion->prepare($query);
+      $statement->execute(array($user));
+      
+      return $statement->fetch(PDO::FETCH_ASSOC);
+   }
+
 }
 
 

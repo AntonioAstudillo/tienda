@@ -10,11 +10,13 @@ class Login extends Controlador{
       $this->modelo = $this->modelo('LoginModelo');
    }
 
+   //Metodo utilizado por default para el sistema. En este metodo mostramos la vista de login
    public function index(){
       $datos = ['title' => 'Login'];
       $this->vista('loginVista' , $datos);
    }
 
+   //Metodo utilizado para implementar la logica de olvido de contraseña
    public function olvido()
    {
       $errores = array();
@@ -117,6 +119,7 @@ class Login extends Controlador{
 
    }
 
+   //Metodo utilizado para registrar un usuario al sistema
    public function registrar()
    {
       $errores = array();
@@ -318,6 +321,7 @@ class Login extends Controlador{
 
 
    }
+
    /**
     * [validarCorreo Esta función recibe un String y retorna un valor booleano. Su funcionalidad es la de validar si un correo ya existe en la DB]
     * @param  [String] $correo [Correo electronico ingresado por el usuario ]
@@ -326,6 +330,46 @@ class Login extends Controlador{
    public function validarCorreo($correo){
       return ($this->modelo->validarCorreo($correo) > 0 ) ? true : false;
    }
+
+   public function verifica(){
+      $respuesta = '';
+
+      if($_SERVER['REQUEST_METHOD'] == 'POST')
+      {
+         $user = isset($_POST['user']) ? Helpers::limpiarDato($_POST['user']) : '';
+         $password = isset($_POST['password']) ? Helpers::limpiarDato($_POST['password']) : '';
+         $respuesta = $this->modelo->verificar($user);
+
+         if($respuesta !== false)
+         {
+
+            //Verificamos que la contraseña o clave, sea igual al hash que está almacenada en la database
+            $respuesta = password_verify($password , $respuesta['clave']);
+
+            $datos = ['usuario' => $user,
+                       'clave' => $password
+                     ];
+
+            if($respuesta){
+               echo 'Bienvenido';
+            }else{
+               $datos = ['title' => 'Login',
+                         'errores' => 'Datos incorrectos',
+                          'user'=> $user,
+                          'password'=>$password];
+               $this->vista('loginVista' , $datos);
+            }
+
+         }else{
+            $datos = ['title' => 'Login',
+                      'errores' => 'No existe ese usuario',
+                       'user'=> $user,
+                       'password'=>$password];
+            $this->vista('loginVista' , $datos);
+         }
+      }
+   }
+
 
 
 
