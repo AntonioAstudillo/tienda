@@ -22,5 +22,13 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                <span class="navbar-toggler-icon"></span>
             </button>
+
+            <div class="collapse navbar-collapse" id="menu">
+               <?php if(isset($data['admon']) && $data['admon'] ): ?>
+                  <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                     <li class="nav-item"> <a href="<?php echo RUTA.'adminUsuarios'; ?>" class="nav-link" >Usuarios</a>  </li>
+                  </ul>
+               <?php endif; ?>
+            </div>
          </div>
       </nav>
