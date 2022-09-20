@@ -343,15 +343,18 @@ class Login extends Controlador{
          if($respuesta !== false)
          {
 
-            //Verificamos que la contraseña o clave, sea igual al hash que está almacenada en la database
+            //Verificamos que la contraseña o clave, sea igual al hash que está almacenada en la database para darle acceso al usuario a la tienda
             $respuesta = password_verify($password , $respuesta['clave']);
 
-            $datos = ['usuario' => $user,
-                       'clave' => $password
-                     ];
-
             if($respuesta){
-               echo 'Bienvenido';
+               //obtengo la información del usuario para crear la sesion
+               $dataUser = $this->modelo->getDataForEmail($user);
+
+               //Hago una instancia de la clase sesion
+               $sesionObj = new Sesion();
+               $sesionObj->iniciarLogin($dataUser);
+               header("Location:".RUTA."tienda");
+
             }else{
                $datos = ['title' => 'Login',
                          'errores' => 'Datos incorrectos',

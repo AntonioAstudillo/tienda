@@ -40,7 +40,7 @@ class LoginModelo
     * @param  [String] $correo               [Correo del usuario]
     * @return [Array]         [La informacion del usuario ]
     */
-   private function getDataForEmail($correo){
+   public function getDataForEmail($correo){
       $query = "SELECT nombre , apellidoPaterno , apellidoMaterno FROM usuarios WHERE email = ? ";
       $statement = $this->conexion->prepare($query);
       $statement->execute(array($correo));
@@ -92,7 +92,7 @@ class LoginModelo
       $query = "SELECT clave FROM usuarios WHERE email = ?";
       $statement = $this->conexion->prepare($query);
       $statement->execute(array($user));
-      
+
       return $statement->fetch(PDO::FETCH_ASSOC);
    }
 
