@@ -14,6 +14,16 @@ class AdminModelo
       $this->conexion = $this->database->getConexion();
 
    }
+
+   public function validarUser($usuario)
+   {
+      $query = "SELECT clave FROM administradores WHERE correo = ?";
+      $statement = $this->conexion->prepare($query);
+      $statement->execute(array($usuario));
+
+      return $statement->fetch(PDO::FETCH_ASSOC);
+
+   }
 }
 
 

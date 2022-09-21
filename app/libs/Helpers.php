@@ -37,6 +37,10 @@ class Helpers{
 
       return $dato;
    }
+
+   public static function verificarClave($clave , $hash){
+      return password_verify($clave , $hash);
+   }
 }
 
 
