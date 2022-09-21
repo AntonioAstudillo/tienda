@@ -53,7 +53,13 @@ class Admin extends Controlador
             {
                echo 'no existe ese usuario';
             }else{
-               echo Helpers::verificarClave($clave , $respuesta['clave']);
+               if(Helpers::verificarClave($clave , $respuesta['clave']))
+               {
+
+               }
+               else{
+                  
+               }
             }
 
 
