@@ -24,6 +24,7 @@ class Admin extends Controlador
 
    public function verifica()
    {
+      //Recibimos datos de la vista
       if($_SERVER['REQUEST_METHOD'] == 'POST')
       {
          $errores = array();
@@ -42,43 +43,81 @@ class Admin extends Controlador
 
          if(count($errores) > 0){
             //hubo errores
+            $datos = ['title' => 'Administrativo Inicio' ,
+                      'menu' => false,
+                      'data' => [],
+                      'admon' => true,
+                      'errores' => $errores
+                     ];
+            $this->vista('adminVista' , $datos);
 
-         }else{
+         }
+         else
+         {
             //no hubo errores
             $respuesta = $this->modelo->validarUser($usuario);
 
-
-
             if(!$respuesta)
             {
-               echo 'no existe ese usuario';
-            }else{
+               $errores[] = 'Datos incorrectos';
+
+               $datos = ['title' => 'Administrativo Inicio' ,
+                         'menu' => false,
+                         'user' => $usuario,
+                         'clave' => $clave,
+                         'admon' => true,
+                         'errores' => $errores
+                        ];
+               $this->vista('adminVista' , $datos);
+            }
+            else
+            {
                if(Helpers::verificarClave($clave , $respuesta['clave']))
                {
+                  //Hacemos un update a la administradores campo login
+                  if($this->modelo->updateLogin(Helpers::getTimeStamp() , $usuario))
+                  {
+                     header('Location:'.RUTA.'adminInicio');
+                  }
+                  else{
+                     $errores[] = 'Hubo un error en el servidor';
+
+                     $datos = ['title' => 'Administrativo Inicio' ,
+                               'menu' => false,
+                               'user' => $usuario,
+                               'clave' => $clave,
+                               'admon' => true,
+                               'errores' => $errores
+                              ];
+                     $this->vista('adminVista' , $datos);
+                  }
 
                }
                else{
-                  
+                  $errores[] = 'Datos incorrectos';
+
+                  $datos = ['title' => 'Administrativo Inicio' ,
+                           'menu' => false,
+                           'user' => $usuario,
+                           'clave' => $clave,
+                           'admon' => true,
+                           'errores' => $errores
+                           ];
+                  $this->vista('adminVista' , $datos);
                }
             }
-
-
-
-
          }
-
-
       }
       else
       {
-
+         $datos = ['title' => 'Administrativo Inicio' ,
+                   'menu' => false,
+                   'data' => [],
+                   'admon' => true
+                  ];
+         $this->vista('adminInicioVista' , $datos);
       }
-      $datos = ['title' => 'Administrativo Inicio' ,
-                'menu' => false,
-                'data' => [],
-                'admon' => true
-               ];
-      $this->vista('adminInicioVista' , $datos);
+
    }
 }
 
