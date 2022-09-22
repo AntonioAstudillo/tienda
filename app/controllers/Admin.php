@@ -77,6 +77,9 @@ class Admin extends Controlador
                   //Hacemos un update a la administradores campo login
                   if($this->modelo->updateLogin(Helpers::getTimeStamp() , $usuario))
                   {
+                     //Creamos la sesion
+                     $sesionObj = new Sesion();
+                     $sesionObj->iniciarLogin($usuario);
                      header('Location:'.RUTA.'adminInicio');
                   }
                   else{

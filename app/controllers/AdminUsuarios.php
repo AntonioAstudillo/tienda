@@ -15,14 +15,23 @@ class AdminUsuarios extends Controlador
 
 
    public function index(){
-      $datos = ['title' => 'Administrativo Usuarios Alta' ,
-                 'subtitulo' => 'Lista de usuarios',
-                 'menu' => false,
-                 'admon' => true,
-                  'data' => []
-               ];
+      $sesion = new Sesion();
 
-      $this->vista('adminUsuariosIndexVista' , $datos);
+      if($sesion->getLogin())
+      {
+         $datos = ['title' => 'Administrativo Usuarios Alta' ,
+                    'subtitulo' => 'Lista de usuarios',
+                    'menu' => false,
+                    'admon' => true,
+                     'data' => []
+                  ];
+
+         $this->vista('adminUsuariosIndexVista' , $datos);
+      }
+      else{
+         header('Location:'.RUTA.'admin');
+      }
+
    }
 
     public function baja()
